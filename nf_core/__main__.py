@@ -1689,8 +1689,3 @@ def sync(dir, from_branch, pull_request, github_repository, username, template_y
     except (SyncException, PullRequestException) as e:
         log.error(e)
         sys.exit(1)
-
-
-# Main script is being run - launch the CLI
-if __name__ == "__main__":
-    run_nf_core()
