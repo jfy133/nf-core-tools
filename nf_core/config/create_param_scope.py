@@ -20,10 +20,8 @@ def ask_config_name(configname="custom"):
     configname = questionary.path("What should your new config file be named?", default=configname).ask()
 
     if os.path.isfile(configname + ".config"):
-        q_overwrite = questionary.select(
-            "Existing config detected. Overwrite?", choices=["Yes", "No"], default="No"
-        ).ask()
-        if q_overwrite == "Yes":
+        q_overwrite = questionary.confirm("Existing config detected. Overwrite?", default="No").ask()
+        if q_overwrite:
             os.remove(configname + ".config")
         else:
             configname = questionary.path("What should your new config file be named?", default=configname).ask()
@@ -76,7 +74,9 @@ def ask_user_name():
     username = getattr(psutil.users()[0], "name")
 
     profile_contact = questionary.text("What is your name", default=username).ask()
-    profile_handle = questionary.text("What your internet [Git] handle (optional)", default="").ask()
+    profile_handle = questionary.text(
+        "What your internet [Git] handle (optional, hit enter for none)", default=""
+    ).ask()
 
     contact = {"profile_contact": profile_contact, "profile_handle": profile_handle}
 

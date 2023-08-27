@@ -24,9 +24,13 @@ configuserstring = (
 
 containeroptions = create_container_scope.create_tool_options()
 containerchoice = create_container_scope.ask_preferred_container(containeroptions)
-
+create_container_scope.ask_cache_requested()
 
 ## TODO Ask if cache dir required
+
+#################
+## Tower scope ##
+#################
 
 ##################
 ## Write config ##
