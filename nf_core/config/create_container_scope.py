@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import sys
 import subprocess
 import questionary
 
@@ -12,7 +13,6 @@ nxf_software_management = (
     "podman",
     "sarus",
     "shifter",
-    "singularity",
     "apptainer",
 )
 
@@ -39,16 +39,34 @@ def create_tool_options(options=nxf_software_management):
     return available
 
 
+##
 def ask_preferred_container(options):
     """
     Ask the user which container system they wish Nextflow to use.
 
     Primarily for defining which configuration scope to use.
     """
-    q_preferredcontainer = questionary.select(
-        "We detected the following available software environment and container engines in your machine./n/nWhich would you like to Nextflow to use?",
-        choices=options,
-    ).ask()
+    if len(options) > 0:
+        q_preferredcontainer = questionary.select(
+            "We detected the following available software environment and container engines in your machine./n/nWhich would you like to Nextflow to use?",
+            choices=options,
+        ).ask()
+    else:
+        q_moving_config = questionary.confirm(
+            "No Nextflow compatible software environment or container systems found on your $PATH. Are you writing this config on one machine but for use on another?",
+        ).ask()
+        if q_moving_config:
+            q_preferredcontainer = questionary.select(
+                "Which software environment or container system will you use on the machine you'll run Nextflow on?",
+                choices=nxf_software_management,
+            ).ask()
+        else:
+            questionary.print(
+                "No software environment or container could be found or selected. Please check the Nextflow docs or your installations.",
+                style="bold fg:red",
+            )
+            sys.exit()
+
     return q_preferredcontainer
 
 
