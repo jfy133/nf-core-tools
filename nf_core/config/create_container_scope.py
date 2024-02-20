@@ -39,7 +39,6 @@ def create_tool_options(options=nxf_software_management):
     return available
 
 
-##
 def ask_preferred_container(options):
     """
     Ask the user which container system they wish Nextflow to use.
@@ -70,10 +69,31 @@ def ask_preferred_container(options):
     return q_preferredcontainer
 
 
+def detect_existing_cache_path():
+    """
+    Detect whether a cache path already exists based on Nextflow environment
+    """
+
+    cachedirs = [
+        os.getenv("NXF_CHARLIECLOUD_CACHEDIR"),
+        os.getenv("NXF_CONDA_CACHEDIR"),
+        os.getenv("NXF_SINGULARITY_CACHEDIR"),
+        os.getenv("NXF_APPTAINER_CACHEDIR"),
+    ]
+
+    return cachedirs
+
+
 def ask_cache_requested():
     """
     Ask user if they want a cache, if yes ask them where to set, check if exists, if not create
     """
+
+    detected_cachedirs = detect_existing_cache_path().any()
+
+    ## TODO: remove nones, pick first?
+    ##guessed_default_cachedir = detected_cachedir
+
     q_cacherequested = questionary.confirm(
         """Would you like to set a cache directory for your conda environments or container images?
         By doing so, you only have to download each environment once, and thus re-use them across each pipeline run.
@@ -81,7 +101,9 @@ def ask_cache_requested():
         """,
     ).ask()
     if q_cacherequested:
-        cache_path = questionary.path("Please specify the path to an existing or new cache directory").ask()
+        cache_path = questionary.path(
+            "Please specify the path to an existing or new cache directory",  # default=guessed_default_cachedir
+        ).ask()
 
         if os.path.isdir(cache_path):
             q_reuse = questionary.confirm("Existing cache directory detected. Re-use?", default="Yes").ask()
